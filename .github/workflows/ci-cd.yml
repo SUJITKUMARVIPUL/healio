@@ -47,4 +47,4 @@ jobs:
         push: true
         tags: |
           ${{ secrets.DOCKERHUB_USERNAME }}/healio:latest
-          ${{ secrets.DOCKERHUB_USERNAME }}/healio:${{ github-sha }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/healio:${{ github.sha }}
