@@ -3,9 +3,9 @@ FROM maven:3.9.6-eclipse-temurin-21-jammy AS build
 WORKDIR /app
 COPY pom.xml .
 # Download dependencies first to leverage Docker layer caching
-RUN mvc dependency:go-offline -B
+RUN mvn dependency:go-offline -B
 COPY src ./src
-RUN mvc clean package -DskipTests
+RUN mvn clean package -DskipTests
 
 # Stage 2: Run the application
 FROM eclipse-temurin:21-jre-jammy
