@@ -1,0 +1,71 @@
+version: '3.8'
+
+networks:
+  healio-network:
+    driver: bridge
+
+services:
+  # 1. Database Service
+  mysql-db:
+    image: mysql:8.0
+    container_name: healio-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: healio_db
+    ports:
+      - "3306:3306"
+    networks:
+      - healio-network
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  # 2. Apache Kafka Dependency: Zookeeper
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: healio-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - healio-network
+
+  # 3. Apache Kafka Broker
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: healio-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    networks:
+      - healio-network
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+  # 4. Healio Spring Boot Application Monolith
+  healio-app:
+    build: .
+    container_name: healio-backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql-db
+      - kafka
+    networks:
+      - healio-network
+    environment:
+      DB_HOST: mysql-db
+      DB_PORT: 3306
+      DB_NAME: healio_db
+      DB_USER: root
+      DB_PASSWORD: rootpassword
+      KAFKA_HOST: kafka
+      KAFKA_PORT: 29092 # Inside the docker network, the app talks to Kafka via port 29092
+
+volumes:
+  mysql-data:
