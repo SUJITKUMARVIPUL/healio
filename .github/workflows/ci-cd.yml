@@ -31,8 +31,8 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets::DOCKERHUB_USERNAME }}
-        password: ${{ secrets::DOCKERHUB_TOKEN }}
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
 
     # Step 5: Set up Docker Buildx for optimization
     - name: Set up Docker Buildx
@@ -46,5 +46,5 @@ jobs:
         file: ./Dockerfile
         push: true
         tags: |
-          ${{ secrets::DOCKERHUB_USERNAME }}/healio:latest
-          ${{ secrets::DOCKERHUB_USERNAME }}/healio:${{ github-sha }}
+          ${{ secrets.DOCKERHUB_USERNAME }}/healio:latest
+          ${{ secrets.DOCKERHUB_USERNAME }}/healio:${{ github-sha }}
