@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: healio-deployment
+  labels:
+    app: healio
+spec:
+  replicas: 3 # High availability: runs 3 identical instances simultaneously
+  selector:
+    matchLabels:
+      app: healio
+  template:
+    metadata:
+      labels:
+        app: healio
+    spec:
+      containers:
+        - name: healio-backend
+          image: sujitkumarvipul/healio:latest # Pulls your production image from Docker Hub
+          ports:
+            - containerPort: 8080
+          imagePullPolicy: Always
+          environment:
+            # Injects your production cloud endpoints directly into the cluster pods
+            - name: DB_HOST
+              value: "byvnbuvdioutxcqp4ctg-mysql.services.clever-cloud.com"
+            - name: DB_PORT
+              value: "3306"
+            - name: DB_NAME
+              value: "byvnbuvdioutxcqp4ctg"
+            - name: DB_USER
+              value: "uxpxwxnst9ehyfbq"
+            - name: DB_PASSWORD
+              value: "ieZmQyQm1VkW2RAKCuUK"
+            - name: KAFKA_HOST
+              value: "pkc-l7pr2.ap-south-1.aws.confluent.cloud"
+            - name: KAFKA_PORT
+              value: "9092"
