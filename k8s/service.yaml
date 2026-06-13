@@ -3,10 +3,11 @@ kind: Service
 metadata:
   name: healio-service
 spec:
-  type: LoadBalancer # Requests a cloud provider load balancer to route traffic from the internet
+  type: NodePort # FIXED: Changed from LoadBalancer to NodePort to work on a single EC2 instance
   selector:
-    app: healio # Matches the label defined in our deployment pods
+    app: healio
   ports:
     - protocol: TCP
-      port: 80       # The public port exposed to the outside internet
-      targetPort: 8080 # The internal port your Spring Boot container listens on
+      port: 80
+      targetPort: 8080
+      nodePort: 30080 # FIXED: Explicitly maps the incoming traffic from AWS port 30080

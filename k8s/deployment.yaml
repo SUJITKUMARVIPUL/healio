@@ -5,7 +5,7 @@ metadata:
   labels:
     app: healio
 spec:
-  replicas: 3 # High availability: runs 3 identical instances simultaneously
+  replicas: 1
   selector:
     matchLabels:
       app: healio
@@ -16,23 +16,30 @@ spec:
     spec:
       containers:
         - name: healio-backend
-          image: sujitkumarvipul/healio:latest # Pulls your production image from Docker Hub
+          image: sujitkumarvipul/healio:latest
           ports:
             - containerPort: 8080
           imagePullPolicy: Always
-          environment:
-            # Injects your production cloud endpoints directly into the cluster pods
+          env:
             - name: DB_HOST
-              value: "byvnbuvdioutxcqp4ctg-mysql.services.clever-cloud.com"
+              value: "YOUR_CLEVER_CLOUD_HOST"
             - name: DB_PORT
               value: "3306"
             - name: DB_NAME
-              value: "byvnbuvdioutxcqp4ctg"
+              value: "YOUR_DATABASE_NAME"
             - name: DB_USER
-              value: "uxpxwxnst9ehyfbq"
+              value: "YOUR_DATABASE_USER"
             - name: DB_PASSWORD
-              value: "ieZmQyQm1VkW2RAKCuUK"
+              value: "YOUR_DATABASE_PASSWORD" # Completely safe placeholder
             - name: KAFKA_HOST
-              value: "pkc-l7pr2.ap-south-1.aws.confluent.cloud"
+              value: "YOUR_CONFLUENT_CLOUD_HOST"
             - name: KAFKA_PORT
               value: "9092"
+            - name: KAFKA_PROTOCOL
+              value: "SASL_SSL"
+            - name: KAFKA_MECHANISM
+              value: "PLAIN"
+            - name: KAFKA_USER
+              value: "YOUR_KAFKA_API_KEY"
+            - name: KAFKA_PASS
+              value: "YOUR_KAFKA_API_SECRET"
